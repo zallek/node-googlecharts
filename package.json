@@ -2,10 +2,20 @@
   "name": "node-googlecharts",
   "version": "0.0.0",
   "description": "Node base Google Charts rendering",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "run": "NODE_ICU_DATA=node_modules/full-icu node bin/node-googlecharts",
+    "example": "NODE_ICU_DATA=node_modules/full-icu node examples/ColumnChart"
   },
   "author": "botify <labs@botify.com> (http://botify.com)",
-  "license": "ISC"
+  "license": "ISC",
+  "peerDependencies": {
+    "full-icu": "^0.57.2"
+  },
+  "dependencies": {
+    "jsdom": "^9.2.1"
+  },
+  "devDependencies": {
+    "full-icu": "^0.57.2"
+  }
 }
