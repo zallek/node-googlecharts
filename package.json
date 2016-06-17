@@ -4,11 +4,13 @@
   "description": "Node base Google Charts rendering",
   "main": "src/index.js",
   "scripts": {
+    "example": "NODE_ICU_DATA=node_modules/full-icu node examples/ColumnChart.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "botify <labs@botify.com> (http://botify.com)",
   "license": "ISC",
   "dependencies": {
+    "full-icu": "^1.0.3",
     "jsdom": "^9.2.1"
   }
 }

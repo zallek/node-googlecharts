@@ -4,7 +4,7 @@ const path = require('path');
 const markup = fs.readFileSync(path.join(__dirname, 'markup.html'), 'utf8');
 
 
-function createGoogleChartWindow() {
+function createGoogleChartWindow(args) {
   return new Promise((resolve, reject) => {
     jsdom.env({
       html: markup,
@@ -21,23 +21,29 @@ function createGoogleChartWindow() {
         if (err) {
           reject(err);
         } else {
-          resolve(window);
+          resolve({
+            window,
+            options: args.options,
+          });
         }
       },
     });
   });
 }
 
-function renderChart(window, options) {
+function renderChart(args) {
   return new Promise((resolve, reject) => {
-    const chartOptions = options.chartOptions;
-    chartOptions.containerId = 'vis_div';
-    const wrapper = new window.google.visualization.ChartWrapper(chartOptions);
-    window.google.visualization.events.addListener(wrapper, 'ready', () => {
-      resolve('done');
+    const wrapper = new args.window.google.visualization.ChartWrapper(args.options.chartOptions);
+    args.window.google.visualization.events.addListener(wrapper, 'ready', () => {
+      resolve(args);
     });
     wrapper.draw();
   });
+}
+
+function extractSVG(args) {
+  return args.window.document
+    .querySelector('#' + args.options.chartOptions.containerId + ' svg').outerHTML;
 }
 
 
@@ -49,8 +55,10 @@ function renderChart(window, options) {
  * @return {Promise}
  */
 function render(options) {
-  return createGoogleChartWindow()
-    .then(window => renderChart(window, options))
+  options.chartOptions.containerId = 'vis_div';
+  return createGoogleChartWindow({ options })
+    .then(renderChart)
+    .then(extractSVG)
 }
 
 module.exports = render;
