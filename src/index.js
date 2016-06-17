@@ -1,13 +1,10 @@
 const jsdom = require('jsdom');
-const fs = require('fs');
-const path = require('path');
-const markup = fs.readFileSync(path.join(__dirname, 'markup.html'), 'utf8');
 
 
 function createGoogleChartWindow(args) {
   return new Promise((resolve, reject) => {
     jsdom.env({
-      html: markup,
+      html: '<html><body></body></html>',
       scripts: [
         'file:///' + __dirname + '/jsapi.js',
         'file:///' + __dirname + '/google-charts.js',
@@ -33,8 +30,18 @@ function createGoogleChartWindow(args) {
 
 function renderChart(args) {
   return new Promise((resolve, reject) => {
-    const wrapper = new args.window.google.visualization.ChartWrapper(args.options.chartOptions);
-    args.window.google.visualization.events.addListener(wrapper, 'ready', () => {
+    const window = args.window;
+    const options = args.options;
+    const chartOptions = options.chartOptions;
+
+    // Create container
+    const container = window.document.createElement('div');
+    container.id = chartOptions.containerId;
+    window.document.body.appendChild(container);
+
+    // Render chart
+    const wrapper = new window.google.visualization.ChartWrapper(chartOptions);
+    window.google.visualization.events.addListener(wrapper, 'ready', () => {
       resolve(args);
     });
     wrapper.draw();
@@ -56,6 +63,9 @@ function extractSVG(args) {
  */
 function render(options) {
   options.chartOptions.containerId = 'vis_div';
+  options.chartOptions.width = 600;
+  options.chartOptions.height = 400;
+
   return createGoogleChartWindow({ options })
     .then(renderChart)
     .then(extractSVG)
