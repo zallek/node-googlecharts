@@ -1,16 +1,15 @@
 {
   "name": "node-googlecharts",
-  "version": "0.0.0",
-  "description": "Node base Google Charts rendering",
+  "version": "0.0.1",
+  "description": "Node based Google Charts rendering",
   "main": "src/index.js",
   "scripts": {
-    "run": "NODE_ICU_DATA=node_modules/full-icu node bin/node-googlecharts",
-    "example": "NODE_ICU_DATA=node_modules/full-icu node examples/ColumnChart"
+    "bin": "NODE_ICU_DATA=node_modules/full-icu node bin/node-googlecharts",
   },
-  "author": "botify <labs@botify.com> (http://botify.com)",
-  "license": "ISC",
-  "peerDependencies": {
-    "full-icu": "^1.0.3"
+  "author": "Nicolas Fortin <nicolas.fortin37@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node" : ">=4.0"
   },
   "dependencies": {
     "jsdom": "^9.2.1"
