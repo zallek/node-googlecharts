@@ -2,14 +2,22 @@
   "name": "node-googlecharts",
   "version": "0.0.1",
   "description": "Node based Google Charts rendering",
-  "main": "src/index.js",
-  "scripts": {
-    "bin": "NODE_ICU_DATA=node_modules/full-icu node bin/node-googlecharts",
-  },
   "author": "Nicolas Fortin <nicolas.fortin37@gmail.com>",
   "license": "MIT",
   "engines": {
     "node" : ">=4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zallek/node-googlecharts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zallek/node-googlecharts/issues"
+  },
+  "homepage": "https://github.com/zallek/node-googlecharts#readme",
+  "main": "src/index.js",
+  "scripts": {
+    "bin": "NODE_ICU_DATA=node_modules/full-icu node bin/node-googlecharts",
   },
   "dependencies": {
     "jsdom": "^9.2.1"
