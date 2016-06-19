@@ -1,5 +1,7 @@
 # Google Chart for Node using jsdom
 
+[![Build Status][travis-image]][travis-url]
+
 ## Requirements
 - Node.js > 4.0
 - ICU4C
@@ -34,3 +36,7 @@ The way Google Chart usually loads its dependencies is incompatible with jsdom [
 
 #### Why does it need ICU4C?
 Google Chart needs full internationalization support whereas it's not built in by default on nodejs.
+
+
+[travis-url]: https://travis-ci.org/zallek/node-googlecharts
+[travis-image]: https://travis-ci.org/zallek/node-googlecharts.svg?branch=master
