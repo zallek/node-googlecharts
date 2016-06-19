@@ -21,7 +21,8 @@ function createGoogleChartWindow(args) {
         } else {
           resolve({
             window,
-            options: args.options,
+            chartOptions: args.chartOptions,
+            format: args.format,
           });
         }
       },
@@ -32,8 +33,7 @@ function createGoogleChartWindow(args) {
 function renderChart(args) {
   return new Promise((resolve, reject) => {
     const window = args.window;
-    const options = args.options;
-    const chartOptions = options.chartOptions;
+    const chartOptions = args.chartOptions;
 
     // Create container
     const container = window.document.createElement('div');
@@ -51,31 +51,32 @@ function renderChart(args) {
 
 function extractSVG(args) {
   return args.window.document
-    .querySelector('#' + args.options.chartOptions.containerId + ' svg').outerHTML;
+    .querySelector('#' + args.chartOptions.containerId + ' svg').outerHTML;
 }
 
 
 /**
  * Render a Google Chart to a png image
- * @param  {options.format} String 'svg'
- * @param  {options.chartOptions} Object Google ChartWrapper options
+ * @param  {chartOptions} Object Google ChartWrapper options
+ * @param  {format} String 'svg'
  * @return {Promise}
  */
-function render(options) {
-  options.format = options.format || 'svg';
+function render(chartOptions, format) {
+  format = format || 'svg';
 
-  if (options.format !== 'svg') {
+  if (format !== 'svg') {
     return Promise.reject(new Error('Unsupported format'));
   }
-  if (!isPlainObject(options.chartOptions)) {
+  if (!isPlainObject(chartOptions)) {
     return Promise.reject(new Error('chartOptions should be an object containing Google ChartWrapper options'));
   }
 
-  options.chartOptions.containerId = 'vis_div';
-  options.chartOptions.width = 600;
-  options.chartOptions.height = 400;
+  // Default chartOptions
+  chartOptions.containerId = 'vis_div';
+  chartOptions.width = 600;
+  chartOptions.height = 400;
 
-  return createGoogleChartWindow({ options })
+  return createGoogleChartWindow({ chartOptions, format })
     .then(renderChart)
     .then(extractSVG)
 }

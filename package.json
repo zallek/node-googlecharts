@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
     "full-icu": "^1.0.3",
     "mocha": "^2.5.3"
   }
