@@ -5,7 +5,7 @@
   "author": "Nicolas Fortin <nicolas.fortin37@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node" : ">=4.0"
+    "node": ">=4.0"
   },
   "repository": {
     "type": "git",
@@ -18,11 +18,14 @@
   "main": "src/index.js",
   "scripts": {
     "bin": "NODE_ICU_DATA=node_modules/full-icu node bin/node-googlecharts",
+    "test": "NODE_ICU_DATA=node_modules/full-icu mocha"
   },
   "dependencies": {
     "jsdom": "^9.2.1"
   },
   "devDependencies": {
-    "full-icu": "^1.0.3"
+    "chai": "^3.5.0",
+    "full-icu": "^1.0.3",
+    "mocha": "^2.5.3"
   }
 }
