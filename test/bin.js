@@ -7,17 +7,19 @@ const exec = require('child_process').exec;
 const input = require('./data/column-chart.input');
 const expectedOutput = getTestData('column-chart.output.svg');
 
-describe('Bin', () => {
-  it('Should accept a single argument with serialized data', done => {
+describe('Bin', function() {
+  this.timeout(3000);
+
+  it('Should accept a single argument with serialized data', function(done) {
     spawnProcess(input, done);
   });
-  it('Should return result on stdout', done => {
+  it('Should return result on stdout', function(done) {
     spawnProcess(input, (error, stdout, stderr) => {
       chai.expect(stdout).to.equal(expectedOutput + '\n');
       done();
     });
   });
-  it('Should return error on stderr', done => {
+  it('Should return error on stderr', function(done) {
     spawnProcess(3, (error, stdout, stderr) => {
       chai.expect(stderr).to.equal('[Error: [InputError] chartOptions should be an object containing Google ChartWrapper options]\n');
       done();
