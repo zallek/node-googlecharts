@@ -2,6 +2,26 @@ const jsdom = require('jsdom');
 const isPlainObject = require('lodash.isplainobject');
 
 
+/**
+* Borrowed from: https://github.com/tmpvar/jsdom/issues/135#issuecomment-68191941
+*/
+function applyJsdomWorkaround(window) {
+  Object.defineProperties(window.HTMLElement.prototype, {
+    offsetHeight: {
+      configurable: true,
+      get: function () {
+        return parseFloat(window.getComputedStyle(this).height) || 0;
+      }
+    },
+    offsetWidth: {
+      configurable: true,
+      get: function () {
+        return parseFloat(window.getComputedStyle(this).width) || 0;
+      }
+    }
+  });
+}
+
 function createGoogleChartWindow(args) {
   return new Promise((resolve, reject) => {
     jsdom.env({
@@ -19,6 +39,7 @@ function createGoogleChartWindow(args) {
         if (err) {
           reject(err);
         } else {
+          applyJsdomWorkaround(window);
           resolve({
             window,
             chartOptions: args.chartOptions,
@@ -40,6 +61,10 @@ function renderChart(args) {
     // Create container
     const container = window.document.createElement('div');
     container.id = chartOptions.containerId;
+    container.setAttribute(
+      'style',
+      `width:${chartOptions.options.width}px;height:${chartOptions.options.height}px;`
+    );
     window.document.body.appendChild(container);
 
     // Render chart
@@ -83,8 +108,9 @@ function render(chartOptions, format) {
 
   // Default chartOptions
   chartOptions.containerId = 'vis_div';
-  chartOptions.width = 600;
-  chartOptions.height = 400;
+  chartOptions.options = chartOptions.options || {};
+  chartOptions.options.width = 600;
+  chartOptions.options.height = 400;
 
   return createGoogleChartWindow({ chartOptions, format })
     .then(renderChart)
