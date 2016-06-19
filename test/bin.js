@@ -19,7 +19,7 @@ describe('Bin', () => {
   });
   it('Should return error on stderr', done => {
     spawnProcess(3, (error, stdout, stderr) => {
-      chai.expect(stderr).to.equal('[Error: chartOptions should be an object containing Google ChartWrapper options]\n');
+      chai.expect(stderr).to.equal('[Error: [InputError] chartOptions should be an object containing Google ChartWrapper options]\n');
       done();
     });
   });

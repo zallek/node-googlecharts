@@ -14,7 +14,7 @@ function createGoogleChartWindow(args) {
         FetchExternalResources: ['script'],
         ProcessExternalResources: ['script'],
       },
-      virtualConsole: jsdom.createVirtualConsole().sendTo(console),
+      // virtualConsole: jsdom.createVirtualConsole().sendTo(console),
       done: (err, window) => {
         if (err) {
           reject(err);
@@ -27,7 +27,9 @@ function createGoogleChartWindow(args) {
         }
       },
     });
-  });
+  }).catch(error =>
+    Promise.reject(new Error('[ChartInitError] ' + error.message))
+  );
 }
 
 function renderChart(args) {
@@ -45,13 +47,21 @@ function renderChart(args) {
     window.google.visualization.events.addListener(wrapper, 'ready', () => {
       resolve(args);
     });
+    window.google.visualization.events.addListener(wrapper, 'error', error => {
+      reject(error);
+    });
     wrapper.draw();
-  });
+  }).catch(error =>
+    Promise.reject(new Error('[RenderingError] ' + error.message))
+  );
 }
 
 function extractSVG(args) {
-  return args.window.document
-    .querySelector('#' + args.chartOptions.containerId + ' svg').outerHTML;
+  const window = args.window;
+  const chartOptions = args.chartOptions;
+
+  return window.document
+    .querySelector('#' + chartOptions.containerId + ' svg').outerHTML;
 }
 
 
@@ -65,10 +75,10 @@ function render(chartOptions, format) {
   format = format || 'svg';
 
   if (format !== 'svg') {
-    return Promise.reject(new Error('Unsupported format'));
+    return Promise.reject(new Error('[InputError] unsupported format'));
   }
   if (!isPlainObject(chartOptions)) {
-    return Promise.reject(new Error('chartOptions should be an object containing Google ChartWrapper options'));
+    return Promise.reject(new Error('[InputError] chartOptions should be an object containing Google ChartWrapper options'));
   }
 
   // Default chartOptions
