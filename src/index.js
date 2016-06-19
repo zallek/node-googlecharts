@@ -1,4 +1,5 @@
 const jsdom = require('jsdom');
+const isPlainObject = require('lodash.isplainobject');
 
 
 function createGoogleChartWindow(args) {
@@ -56,12 +57,20 @@ function extractSVG(args) {
 
 /**
  * Render a Google Chart to a png image
- * @param  {options.width} Number
- * @param  {options.height} Number
+ * @param  {options.format} String 'svg'
  * @param  {options.chartOptions} Object Google ChartWrapper options
  * @return {Promise}
  */
 function render(options) {
+  options.format = options.format || 'svg';
+
+  if (options.format !== 'svg') {
+    return Promise.reject(new Error('Unsupported format'));
+  }
+  if (!isPlainObject(options.chartOptions)) {
+    return Promise.reject(new Error('chartOptions should be an object containing Google ChartWrapper options'));
+  }
+
   options.chartOptions.containerId = 'vis_div';
   options.chartOptions.width = 600;
   options.chartOptions.height = 400;

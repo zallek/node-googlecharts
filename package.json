@@ -21,7 +21,8 @@
     "test": "NODE_ICU_DATA=node_modules/full-icu mocha"
   },
   "dependencies": {
-    "jsdom": "^9.2.1"
+    "jsdom": "^9.2.1",
+    "lodash.isplainobject": "^4.0.4"
   },
   "devDependencies": {
     "chai": "^3.5.0",
