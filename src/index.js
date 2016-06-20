@@ -120,8 +120,8 @@ function render(chartOptions, format) {
   // Default chartOptions
   chartOptions.containerId = 'vis_div';
   chartOptions.options = chartOptions.options || {};
-  chartOptions.options.width = 600;
-  chartOptions.options.height = 400;
+  chartOptions.options.width = chartOptions.options.width || 600;
+  chartOptions.options.height = chartOptions.options.height || 400;
 
   return createGoogleChartWindow({ chartOptions, format })
     .then(renderChart)
