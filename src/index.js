@@ -3,14 +3,28 @@ const isPlainObject = require('lodash.isplainobject');
 
 
 /**
-* Borrowed from: https://github.com/tmpvar/jsdom/issues/135#issuecomment-68191941
+* offsetWidth && offsetHeight weren't implemented. The implementation is taken from
+* https://github.com/tmpvar/jsdom/issues/135#issuecomment-68191941
+* clientWidth && clientHeight had the same issue (the implementation is wrong but it's good enough for Google Chart)
 */
 function applyJsdomWorkaround(window) {
   Object.defineProperties(window.HTMLElement.prototype, {
+    clientHeight: {
+      configurable: true,
+      get: function () {
+        return parseFloat(window.getComputedStyle(this).height) || 0;
+      }
+    },
     offsetHeight: {
       configurable: true,
       get: function () {
         return parseFloat(window.getComputedStyle(this).height) || 0;
+      }
+    },
+    clientWidth: {
+      configurable: true,
+      get: function () {
+        return parseFloat(window.getComputedStyle(this).width) || 0;
       }
     },
     offsetWidth: {
@@ -18,36 +32,33 @@ function applyJsdomWorkaround(window) {
       get: function () {
         return parseFloat(window.getComputedStyle(this).width) || 0;
       }
-    }
+    },
   });
 }
 
 function createGoogleChartWindow(args) {
   return new Promise((resolve, reject) => {
-    jsdom.env({
-      html: '<html><body></body></html>',
-      scripts: [
-        'file:///' + __dirname + '/jsapi.js',
-        'file:///' + __dirname + '/google-charts.js',
-      ],
+    const baseHtml = (
+      `<html><head>
+        <script src="file:///${__dirname}/jsapi.js"></script>
+        <script src="file:///${__dirname}/google-charts.js"></script>
+      </head><body></body></html>`
+    );
+    const window = jsdom.jsdom(baseHtml, {
       features: {
         FetchExternalResources: ['script'],
         ProcessExternalResources: ['script'],
       },
-      // virtualConsole: jsdom.createVirtualConsole().sendTo(console),
-      done: (err, window) => {
-        if (err) {
-          reject(err);
-        } else {
-          applyJsdomWorkaround(window);
-          resolve({
-            window,
-            chartOptions: args.chartOptions,
-            format: args.format,
-          });
-        }
-      },
-    });
+    }).defaultView;
+    window.addEventListener('load', event => {
+      applyJsdomWorkaround(window);
+      resolve({
+        window,
+        chartOptions: args.chartOptions,
+        format: args.format,
+      });
+    }, 2000);
+    // virtualConsole: jsdom.createVirtualConsole().sendTo(console),
   }).catch(error =>
     Promise.reject(new Error('[ChartInitError] ' + error.message))
   );

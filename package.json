@@ -18,6 +18,7 @@
   "main": "src/index.js",
   "scripts": {
     "bin": "NODE_ICU_DATA=node_modules/full-icu node bin/node-googlecharts",
+    "example": "NODE_ICU_DATA=node_modules/full-icu node examples/ColumnChart",
     "test": "NODE_ICU_DATA=node_modules/full-icu mocha"
   },
   "dependencies": {
