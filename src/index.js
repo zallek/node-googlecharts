@@ -40,16 +40,16 @@ function createGoogleChartWindow(args) {
   return new Promise((resolve, reject) => {
     const baseHtml = (
       `<html><head>
-        <script src="file:///${__dirname}/jsapi.js"></script>
-        <script src="file:///${__dirname}/google-charts.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       </head><body></body></html>`
     );
     const window = jsdom.jsdom(baseHtml, {
       features: {
-        FetchExternalResources: ['script'],
-        ProcessExternalResources: ['script'],
+        FetchExternalResources: ['script', 'link'],
+        ProcessExternalResources: ['script']
       },
     }).defaultView;
+
     window.addEventListener('load', event => {
       applyJsdomWorkaround(window);
       resolve({
@@ -58,7 +58,6 @@ function createGoogleChartWindow(args) {
         format: args.format,
       });
     }, 2000);
-    // virtualConsole: jsdom.createVirtualConsole().sendTo(console),
   }).catch(error =>
     Promise.reject(new Error('[ChartInitError] ' + error.message))
   );
@@ -66,8 +65,9 @@ function createGoogleChartWindow(args) {
 
 function renderChart(args) {
   return new Promise((resolve, reject) => {
-    const window = args.window;
     const chartOptions = args.chartOptions;
+    const window = args.window;
+    const google = window.google;
 
     // Create container
     const container = window.document.createElement('div');
@@ -78,15 +78,23 @@ function renderChart(args) {
     );
     window.document.body.appendChild(container);
 
-    // Render chart
-    const wrapper = new window.google.visualization.ChartWrapper(chartOptions);
-    window.google.visualization.events.addListener(wrapper, 'ready', () => {
-      resolve(args);
-    });
-    window.google.visualization.events.addListener(wrapper, 'error', error => {
-      reject(error);
-    });
-    wrapper.draw();
+    google.charts.load('current', {'packages': chartOptions.packages});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable(chartOptions.data);
+      var chart = new google.visualization[chartOptions.chartType](container);
+
+      google.visualization.events.addListener(chart, 'ready', () => {
+        resolve(args);
+      });
+
+      google.visualization.events.addListener(chart, 'error', error => {
+        reject(error);
+      });
+
+      chart.draw(data, chartOptions.options);
+    }
   }).catch(error =>
     Promise.reject(new Error('[RenderingError] ' + error.message))
   );
@@ -96,10 +104,12 @@ function extractSVG(args) {
   const window = args.window;
   const chartOptions = args.chartOptions;
 
-  return window.document
-    .querySelector('#' + chartOptions.containerId + ' svg').outerHTML;
-}
+  let svg = window.document.querySelector('#' + chartOptions.containerId + ' svg');
 
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+  return svg.outerHTML;
+}
 
 /**
  * Render a Google Chart to a png image
@@ -122,6 +132,7 @@ function render(chartOptions, format) {
   chartOptions.options = chartOptions.options || {};
   chartOptions.options.width = chartOptions.options.width || 600;
   chartOptions.options.height = chartOptions.options.height || 400;
+  chartOptions.packages = chartOptions.packages || ['corechart'];
 
   return createGoogleChartWindow({ chartOptions, format })
     .then(renderChart)
