@@ -65,8 +65,8 @@ function createGoogleChartWindow(args) {
 
 function renderChart(args) {
   return new Promise((resolve, reject) => {
-    const chartOptions = args.chartOptions;
     const window = args.window;
+    const chartOptions = args.chartOptions;
     const google = window.google;
 
     // Create container
@@ -78,32 +78,26 @@ function renderChart(args) {
     );
     window.document.body.appendChild(container);
 
-    google.charts.load('current', {'packages': chartOptions.packages});
+    google.charts.load('current');
     google.charts.setOnLoadCallback(drawChart);
 
-    function drawChart(r) {
-      if (!google.visualization[chartOptions.chartType]) {
-        return reject(new Error('The chart type is not supported'));
-      }
-
-      var data;
+    function drawChart() {
+      var wrapper;
       try {
-        data = google.visualization.arrayToDataTable(chartOptions.data);
+        wrapper = new google.visualization.ChartWrapper(chartOptions);
       } catch(e) {
         return reject(e);
       }
 
-      var chart = new google.visualization[chartOptions.chartType](container);
-
-      google.visualization.events.addListener(chart, 'ready', () => {
+      google.visualization.events.addListener(wrapper, 'ready', () => {
         resolve(args);
       });
 
-      google.visualization.events.addListener(chart, 'error', error => {
+      google.visualization.events.addListener(wrapper, 'error', error => {
         reject(new Error(error.message));
       });
 
-      chart.draw(data, chartOptions.options);
+      wrapper.draw();
     }
   }).catch(error =>
     Promise.reject(new Error('[RenderingError] ' + error.message))
@@ -139,11 +133,11 @@ function render(chartOptions, format) {
   if (!chartOptions.chartType) {
     return Promise.reject(new Error('[InputError] no chart type specified'));
   }
-  if (!chartOptions.data) {
-    return Promise.reject(new Error('[InputError] no data specified'));
+  if (!chartOptions.dataTable) {
+    return Promise.reject(new Error('[InputError] no dataTable specified'));
   }
-  if (!Array.isArray(chartOptions.data)) {
-    return Promise.reject(new Error('[InputError] data must be an array'));
+  if (!Array.isArray(chartOptions.dataTable)) {
+    return Promise.reject(new Error('[InputError] dataTable must be an array'));
   }
 
   // Default chartOptions
@@ -151,7 +145,6 @@ function render(chartOptions, format) {
   chartOptions.options = chartOptions.options || {};
   chartOptions.options.width = chartOptions.options.width || 600;
   chartOptions.options.height = chartOptions.options.height || 400;
-  chartOptions.packages = chartOptions.packages || ['corechart'];
 
   return createGoogleChartWindow({ chartOptions, format })
     .then(renderChart)

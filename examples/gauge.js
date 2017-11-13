@@ -8,8 +8,7 @@ const nodeGoogleCharts = require('../src');
 
 nodeGoogleCharts({
   chartType: 'Gauge',
-  packages: ['gauge'],
-  data: [
+  dataTable: [
     ['Label', 'Value'],
     ['Memory', 80],
     ['CPU', 55],

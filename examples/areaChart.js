@@ -9,7 +9,7 @@ const nodeGoogleCharts = require('../src');
 
 nodeGoogleCharts({
   chartType: 'AreaChart',
-  data: [
+  dataTable: [
     ['Year', 'Sales', 'Expenses'],
     ['2013',  1000,      400],
     ['2014',  1170,      460],

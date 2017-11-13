@@ -11,8 +11,7 @@ const nodeGoogleCharts = require('../src');
 
 nodeGoogleCharts({
   chartType: 'ColumnChart',
-  packages: ['corechart', 'bar'],
-  data: [
+  dataTable: [
     ['', 'Germany', 'USA', 'Brazil', 'Canada', 'France', 'RU'],
     ['', 70, 30, 40, 50, 60, 80]
   ],
