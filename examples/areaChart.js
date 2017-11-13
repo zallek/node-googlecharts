@@ -25,7 +25,7 @@ nodeGoogleCharts({
     vAxis: {
       minValue: 0
     }
-  },
+  }
 })
 .then(console.log)
 .catch(console.error);

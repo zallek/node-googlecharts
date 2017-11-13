@@ -33,7 +33,7 @@ nodeGoogleCharts({
     vAxis: {
       title: 'City'
     }
-  },
+  }
 })
 .then(console.log)
 .catch(console.error);

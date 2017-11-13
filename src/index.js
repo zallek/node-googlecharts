@@ -81,8 +81,18 @@ function renderChart(args) {
     google.charts.load('current', {'packages': chartOptions.packages});
     google.charts.setOnLoadCallback(drawChart);
 
-    function drawChart() {
-      var data = google.visualization.arrayToDataTable(chartOptions.data);
+    function drawChart(r) {
+      if (!google.visualization[chartOptions.chartType]) {
+        return reject(new Error('The chart type is not supported'));
+      }
+
+      var data;
+      try {
+        data = google.visualization.arrayToDataTable(chartOptions.data);
+      } catch(e) {
+        return reject(e);
+      }
+
       var chart = new google.visualization[chartOptions.chartType](container);
 
       google.visualization.events.addListener(chart, 'ready', () => {
@@ -90,7 +100,7 @@ function renderChart(args) {
       });
 
       google.visualization.events.addListener(chart, 'error', error => {
-        reject(error);
+        reject(new Error(error.message));
       });
 
       chart.draw(data, chartOptions.options);
@@ -104,7 +114,7 @@ function extractSVG(args) {
   const window = args.window;
   const chartOptions = args.chartOptions;
 
-  let svg = window.document.querySelector('#' + chartOptions.containerId + ' svg');
+  var svg = window.document.querySelector('#' + chartOptions.containerId + ' svg');
 
   svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
@@ -125,6 +135,15 @@ function render(chartOptions, format) {
   }
   if (!isPlainObject(chartOptions)) {
     return Promise.reject(new Error('[InputError] chartOptions should be an object containing Google ChartWrapper options'));
+  }
+  if (!chartOptions.chartType) {
+    return Promise.reject(new Error('[InputError] no chart type specified'));
+  }
+  if (!chartOptions.data) {
+    return Promise.reject(new Error('[InputError] no data specified'));
+  }
+  if (!Array.isArray(chartOptions.data)) {
+    return Promise.reject(new Error('[InputError] data must be an array'));
   }
 
   // Default chartOptions

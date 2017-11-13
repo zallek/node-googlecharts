@@ -20,7 +20,7 @@ nodeGoogleCharts({
     redFrom: 90, redTo: 100,
     yellowFrom:75, yellowTo: 90,
     minorTicks: 5
-  },
+  }
 })
 .then(console.log)
 .catch(console.error);

@@ -18,7 +18,7 @@ nodeGoogleCharts({
   ],
   options: {
     title: 'Countries'
-  },
+  }
 })
 .then(console.log)
 .catch(console.error);
