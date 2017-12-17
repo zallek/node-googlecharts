@@ -3,6 +3,7 @@ const path = require('path');
 const chai = require('chai');
 const exec = require('child_process').exec;
 
+chai.use(require('chai-string'));
 
 const input = require('./data/column-chart.input');
 const expectedOutput = getTestData('column-chart.output.svg');
@@ -15,13 +16,13 @@ describe('Bin', function() {
   });
   it('Should return result on stdout', function(done) {
     spawnProcess(input, (error, stdout, stderr) => {
-      chai.expect(stdout).to.equal(expectedOutput + '\n');
+      chai.expect(stdout).to.equal(expectedOutput);
       done();
     });
   });
   it('Should return error on stderr', function(done) {
     spawnProcess(3, (error, stdout, stderr) => {
-      chai.expect(stderr).to.equal('[Error: [InputError] chartOptions should be an object containing Google ChartWrapper options]\n');
+      chai.expect(stderr).to.startWith('Error: [InputError] chartOptions should be an object containing Google ChartWrapper options\n');
       done();
     });
   });

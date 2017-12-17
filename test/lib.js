@@ -4,10 +4,10 @@ const chai = require('chai');
 const chaiAsPromised = require("chai-as-promised");
 const nodeGoogleCharts = require('../src');
 
-
 chai.use(chaiAsPromised);
 const tests = [
   'column-chart',
+  'gauge',
 ];
 
 describe('Lib', () => {
@@ -16,7 +16,7 @@ describe('Lib', () => {
       const input = require(`./data/${testId}.input`);
       const expectedOutput = getTestData(testId + '.output.svg');
       it('Test ' + testId, () => {
-        return chai.expect(nodeGoogleCharts(input)).to.become(expectedOutput);
+        return chai.expect(nodeGoogleCharts(input).then(svg => svg + '\n')).to.become(expectedOutput);
       });
     });
   });
@@ -32,17 +32,29 @@ describe('Lib', () => {
       .be.rejectedWith(Error, '[InputError] chartOptions should be an object containing Google ChartWrapper options');
     });
 
-    it('Mising chart type', () => {
-      return chai.expect(nodeGoogleCharts({}))
-      .be.rejectedWith(Error, '[RenderingError] The chart type is not defined.');
+    it('Missing data', () => {
+      return chai.expect(nodeGoogleCharts({chartType: 'ColumnChart'}))
+      .be.rejectedWith(Error, '[InputError] no dataTable specified');
+    });
+
+    it('data not an array', () => {
+      return chai.expect(nodeGoogleCharts({chartType: 'ColumnChart', dataTable: 'invalid'}))
+      .be.rejectedWith(Error, '[InputError] dataTable must be an array');
+    });
+
+    it('Missing chart type', () => {
+      return chai.expect(nodeGoogleCharts({dataTable: []}))
+      .be.rejectedWith(Error, '[InputError] no chart type specified');
+    });
+
+    it('Unsupported chart type', () => {
+      return chai.expect(nodeGoogleCharts({chartType: 'invalid', dataTable: []}))
+      .be.rejectedWith(Error, '[RenderingError] Invalid visualization type: invalid');
     });
 
     it('Missing chart data', () => {
-      const input = {
-        chartType: 'ColumnChart',
-      };
-      return chai.expect(nodeGoogleCharts(input))
-      .be.rejectedWith(Error, '[RenderingError] Cannot draw chart: no data specified.');
+      return chai.expect(nodeGoogleCharts({chartType: 'ColumnChart'}))
+      .be.rejectedWith(Error, '[InputError] no dataTable specified');
     });
 
     it('Invalid chart data', () => {
